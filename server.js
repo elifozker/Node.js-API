@@ -1,33 +1,27 @@
+require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose');
-const Product = require('./models/productModel');
+const productRoute = require('./routes/productRoute');
 const app = express()
-const port = 3000
 
+const PORT = process.env.PORT || 3000
+const MONGO_URL = process.env.MONGO_URL;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }))
+
+app.use('/api/products',productRoute);
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.post('/product',async(req,res) => {
-  try{
-    const product = await Product.create(req.body)
-    res.status(200).json(product);
-
-  }catch(error){
-    console.log(error);
-    res.status(500).json({message: error.message})
-  }
-})
-
-
-mongoose.connect('mongodb+srv://elifozker:Uykusuz01@cluster0.ba3zr3y.mongodb.net/crudsimple?retryWrites=true&w=majority').then(() =>{
+mongoose.set("strictQuery",false);
+mongoose.connect(MONGO_URL).then(() => {
   console.log("Connected to mongodb");
-  app.listen(port, () => {
-    console.log(`Node API listening on port ${port}`)
+  app.listen(PORT, () => {
+    console.log(`Node API listening on port ${PORT}`)
   });
-}).catch(() =>{
+}).catch(() => {
   console.log(error);
 });
